@@ -46,12 +46,12 @@ static esp_ble_adv_params_t ble_adv_params = {
     // Minimum advertising interval for undirected and low duty cycle
     // directed advertising. Range: 0x0020 to 0x4000 Default: N = 0x0800
     // (1.28 second) Time = N * 0.625 msec Time Range: 20 ms to 10.24 sec
-    .adv_int_min        = 0x0021, // 10s
+    .adv_int_min        = 0x0021, // 20ms
     // Advertising max interval:
     // Maximum advertising interval for undirected and low duty cycle
     // directed advertising. Range: 0x0020 to 0x4000 Default: N = 0x0800
     // (1.28 second) Time = N * 0.625 msec Time Range: 20 ms to 10.24 sec
-    .adv_int_max        = 0x0021, // 10s
+    .adv_int_max        = 0x0021, // 20ms
     // Advertisement type
     .adv_type           = ADV_TYPE_NONCONN_IND,
     // Use the random address
@@ -164,18 +164,15 @@ void app_main(void)
     ESP_LOGI(LOG_TAG, "application initialized");
     
     while (true) {
-        // Wake up in 1.9 seconds
-         
+	    
+        // Goto sleep for 1.9 seconds
         esp_sleep_enable_timer_wakeup(1900000);
-
         ESP_LOGE(LOG_TAG, "Entering light sleep");
 
-        // Enter sleep mode
-         
+        // Enter sleep mode 
         esp_light_sleep_start();
         
         // Execution continues here after wakeup
-         
         ESP_LOGE(LOG_TAG, "Returned from light sleep");
         
         // Lets transmit a couple of times
