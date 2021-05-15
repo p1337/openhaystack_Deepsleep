@@ -7,6 +7,10 @@ After flashing our firmware, the device sends out Bluetooth Low Energy advertise
 
 Note that the firmware is just a proof-of-concept and currently only implements advertising a single static key. This means that **devices running this firmware are trackable** by other devices in proximity.
 
+
+## Changes
+
+I have implemented light sleep which drops power usage from 40ma on average down to 10ma while using a ESP32 OLED wemos dev board available on aliexpress 
 ## Requirements
 
 To change and rebuild the firmware, you need Espressif's IoT Development Framework (ESP-IDF).
@@ -39,6 +43,7 @@ Use the `flash_esp32.sh` script to deploy the firmware and a public key to an ES
 ./flash_esp32.sh -p /dev/yourSerialPort "public-key-in-base64"
 ```
 
+> **Note:** You may need to manualy put the device into bootloader mode after it first connects.
 > **Note:** You might need to reset your device after running the script before it starts sending advertisements.
 
 For more options, see `./flash-esp32.h --help`.
