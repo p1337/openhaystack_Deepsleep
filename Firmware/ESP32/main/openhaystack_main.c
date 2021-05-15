@@ -5,7 +5,6 @@
 
 #include "nvs_flash.h"
 #include "esp_partition.h"
-
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gattc_api.h"
@@ -14,6 +13,10 @@
 #include "esp_bt_defs.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_sleep.h"
+#include "esp_event.h"
+#include "esp_timer.h"
 
 static const char* LOG_TAG = "open_haystack";
 
@@ -34,7 +37,7 @@ static uint8_t adv_data[31] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, /* First two bits */
-	0x00, /* Hint (0x00) */
+	0x00, /* Hint (0x00) */ 
 };
 
 /* https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/bluetooth/esp_gap_ble.html#_CPPv420esp_ble_adv_params_t */
@@ -43,12 +46,12 @@ static esp_ble_adv_params_t ble_adv_params = {
     // Minimum advertising interval for undirected and low duty cycle
     // directed advertising. Range: 0x0020 to 0x4000 Default: N = 0x0800
     // (1.28 second) Time = N * 0.625 msec Time Range: 20 ms to 10.24 sec
-    .adv_int_min        = 0x0640, // 1s
+    .adv_int_min        = 0x0021, // 10s
     // Advertising max interval:
     // Maximum advertising interval for undirected and low duty cycle
     // directed advertising. Range: 0x0020 to 0x4000 Default: N = 0x0800
     // (1.28 second) Time = N * 0.625 msec Time Range: 20 ms to 10.24 sec
-    .adv_int_max        = 0x0C80, // 2s
+    .adv_int_max        = 0x0021, // 10s
     // Advertisement type
     .adv_type           = ADV_TYPE_NONCONN_IND,
     // Use the random address
@@ -130,7 +133,7 @@ void app_main(void)
 
     esp_bluedroid_init();
     esp_bluedroid_enable();
-
+    
     // Load the public key from the key partition
     static uint8_t public_key[28];
     if (load_key(public_key, sizeof(public_key)) != ESP_OK) {
@@ -159,4 +162,24 @@ void app_main(void)
         return;
     }
     ESP_LOGI(LOG_TAG, "application initialized");
+    
+    while (true) {
+        // Wake up in 1.9 seconds
+         
+        esp_sleep_enable_timer_wakeup(1900000);
+
+        ESP_LOGE(LOG_TAG, "Entering light sleep");
+
+        // Enter sleep mode
+         
+        esp_light_sleep_start();
+        
+        // Execution continues here after wakeup
+         
+        ESP_LOGE(LOG_TAG, "Returned from light sleep");
+        
+        // Lets transmit a couple of times
+        vTaskDelay(10);
+    }
+    
 }
